@@ -1,34 +1,28 @@
 package main
 
 import (
-	"fmt"
 	"time"
 )
 
-var fahrrunter = make(chan bool, 1)
+var (
+	Fahrrunter = make(chan bool, 1)
+	NewFiles   = make(chan []string)
+)
 
-func runMonitoring(directory string, idleTime int) {
-	for {
+func monitor(directory string, idleTime int) {
+	for i := 1; i <= idleTime; i++ {
 		select {
-		case <-fahrrunter:
+		case <-Fahrrunter:
 			return
 		default:
-			monitor(directory)
-			catchSignalsWhileIdle(idleTime)
+			checkDir(directory)
+			time.Sleep(1 * time.Second)
 		}
 	}
 }
 
-func catchSignalsWhileIdle(idleTime int) {
-	for i := 1; i <= idleTime; i++ {
-		select {
-		case <-stopchannel:
-			fmt.Println("\nrecieved stop signal, will shut down")
-			fahrrunter <- true
-			fmt.Println("waiting for processes to finish...")
-			return
-		default:
-			time.Sleep(1 * time.Second)
-		}
-	}
+func checkDir(directory string) {
+	filelist := []string{"Hallo", "Welt", directory}
+
+	NewFiles <- filelist
 }
