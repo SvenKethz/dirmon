@@ -9,20 +9,25 @@ var (
 	NewFiles   = make(chan []string)
 )
 
-func monitor(directory string, idleTime int) {
-	for i := 1; i <= idleTime; i++ {
+func Monitor(directory string, idleTime int) {
+	for {
 		select {
 		case <-Fahrrunter:
 			return
 		default:
-			checkDir(directory)
-			time.Sleep(1 * time.Second)
+			CheckDir(directory)
+			time.Sleep(time.Duration(idleTime) * time.Second)
 		}
 	}
 }
 
-func checkDir(directory string) {
-	filelist := []string{"Hallo", "Welt", directory}
-
-	NewFiles <- filelist
+func CheckDir(directory string) {
+	var filelist []string
+	existing_files := 0
+	if len(filelist) != existing_files {
+		existing_files = len(filelist)
+		NewFiles <- filelist
+	} else {
+		filelist = []string{"Hallo", "Welt", directory}
+	}
 }
